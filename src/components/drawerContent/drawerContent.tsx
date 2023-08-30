@@ -46,7 +46,7 @@ export function DrawerContent(props:any) {
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItem
               icon={({focused}) => (
-                <Ionicons name="home-outline" color={'#009387'} size={20} />
+                <Ionicons name="home-outline" color={'#8658c7'} size={20} />
               )}
               label="Home"
               onPress={() => {
@@ -55,7 +55,7 @@ export function DrawerContent(props:any) {
             />
             <DrawerItem
               icon={({focused}) => (
-                <Entypo name="back-in-time" color={'#009387'} size={20} />
+                <Entypo name="back-in-time" color={'#8658c7'} size={20} />
               )}
               label="History"
               onPress={() => {
@@ -64,16 +64,16 @@ export function DrawerContent(props:any) {
             />
             <DrawerItem
               icon={({focused}) => (
-                <Ionicons name="bookmarks-outline" color={'#009387'} size={20} />
+                <Ionicons name="bookmarks-outline" color={'#8658c7'} size={20} />
               )}
-              label="Favorites"
+              label="BookMark"
               onPress={() => {
-                props.navigation.navigate('Favorites');
+                props.navigation.navigate('BookMark');
               }}
             />
             <DrawerItem
               icon={({focused}) => (
-                <MaterialCommunityIcons name="text-to-speech" color={'#009387'} size={22} />
+                <MaterialCommunityIcons name="text-to-speech" color={'#8658c7'} size={22} />
               )}
               label="Speech To Text"
               onPress={() => {
@@ -82,7 +82,7 @@ export function DrawerContent(props:any) {
             />
             <DrawerItem
               icon={({focused}) => (
-                <FontAwesome5 name="headset" color={'#009387'} size={20} />
+                <FontAwesome5 name="headset" color={'#8658c7'} size={20} />
               )}
               label="Support"
               onPress={() => {
@@ -97,7 +97,7 @@ export function DrawerContent(props:any) {
             //   }}
               >
               <View style={styles.preference}>
-                <Text style={{fontWeight: 'bold', color: '#009387'}}>
+                <Text style={{fontWeight: 'bold', color: '#8658c7'}}>
                   Dark Theme
                 </Text>
                 <View pointerEvents="none">
@@ -111,7 +111,7 @@ export function DrawerContent(props:any) {
       <Drawer.Section style={styles.bottomDrawerSection}>
         <DrawerItem
           icon={({color, size}) => (
-            <FontAwesome5 name="user-lock" color={'#009387'} size={20} />
+            <FontAwesome5 name="user-lock" color={'#8658c7'} size={20} />
           )}
           label="Quit App"
           onPress={() => {BackHandler.exitApp()}}
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
     fontWeight: 'bold',
-    color: '#009387',
+    color: '#8658c7',
   },
   caption: {
     fontSize: 14,

@@ -14,24 +14,29 @@ import {
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import {TextInput} from 'react-native-paper'; //@ts-ignore
-import Icon from 'react-native-vector-icons/Octicons';
+import Icon from 'react-native-vector-icons/Octicons'; //@ts-ignore
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Tts from 'react-native-tts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useRoute} from '@react-navigation/native';
 
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 
 const Home = () => {
   const textInputRef = useRef(null);
+  const route = useRoute();
 
   const [newWord, setNewWord] = useState('');
   const [checkedWord, setCheckedWord] = useState('');
-  // const [definition, setDefinition] = useState('');
   const [definitionArr, setDefinitionArr] = useState('');
   const [partsOfSpeech, setPartsOfSpeech] = useState('');
   const [example, setExample] = useState('');
   const [res, setRes] = useState('');
   const [wordExist, setWordExist] = useState(false);
   const [state, setState] = useState(false);
+  const [bookmark, setBookmark] = useState(false);
+  const [inputValidation, setInputValidation] = useState('');
 
   useEffect(() => {
     Tts.setDefaultRate(0.5);
@@ -50,18 +55,59 @@ const Home = () => {
     setNewWord(enteredWord);
   };
 
+  const LoadWordFromDiffScreem = async (item: any) => {
+    setBookmark(false);
+    setRes('loading');
+    setInputValidation('false');
+
+    var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + item;
+
+    return fetch(url)
+      .then(data => {
+        return data.json();
+      })
+      .then(response => {
+        setRes('');
+        setState(true);
+        storingWords(newWord);
+        bookmarkHandle(newWord);
+        if (
+          response.message ==
+          "Sorry pal, we couldn't find definitions for the word you were looking for."
+        ) {
+          console.log('Not found');
+          setWordExist(false);
+        } else {
+          setWordExist(true);
+
+          var word = response[0].word;
+          setCheckedWord(word);
+
+          var defs = response[0].meanings[0].definitions;
+          setDefinitionArr(defs);
+
+          defs.forEach((element: any) => {
+            console.log(element);
+          });
+
+          var pos = response[0].meanings[0].partOfSpeech;
+          setPartsOfSpeech(pos);
+
+          var eg = response[0].meanings[0].definitions[0].example;
+          setExample(eg);
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  };
+
   const getInfo = () => {
     if (newWord == '') {
-      Alert.alert('Info', 'Search Box is Empty', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {text: 'Search', onPress: () => {focusTextInput()}},
-      ]);
+      setInputValidation('true');
     } else {
       setRes('loading');
+      setInputValidation('false');
 
       var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + newWord;
 
@@ -72,6 +118,8 @@ const Home = () => {
         .then(response => {
           setRes('');
           setState(true);
+          storingWords(newWord);
+          bookmarkHandle(newWord);
           if (
             response.message ==
             "Sorry pal, we couldn't find definitions for the word you were looking for."
@@ -83,9 +131,6 @@ const Home = () => {
 
             var word = response[0].word;
             setCheckedWord(word);
-
-            // var def = response[0].meanings[0].definitions[0].definition;
-            // setDefinition(def);
 
             var defs = response[0].meanings[0].definitions;
             setDefinitionArr(defs);
@@ -125,19 +170,105 @@ const Home = () => {
 
   const clear = () => {
     setCheckedWord('');
-    // setDefinition('');
     setExample('');
     setNewWord('');
     setRes('');
     setState(false);
     setWordExist(false);
+    // setInputValidation('');
+    setBookmark(false);
+    setDefinitionArr('');
+    setPartsOfSpeech('');
+    if (textInputRef.current == null) {
+    } else {
+      //@ts-ignore
+      textInputRef.current.blur();
+    }
   };
-  const dataArray = ['Item 1', 'Item 2', 'Item 3', 'Item 4'];
+
+  const storingWords = async (searchTerm: any) => {
+    if (searchTerm.trim() !== '') {
+      try {
+        const historyData = await AsyncStorage.getItem('searchHistory');
+        const history = historyData ? JSON.parse(historyData) : [];
+
+        // Check if the word already exists in history
+        if (!history.includes(searchTerm)) {
+          history.unshift(searchTerm); // Add the new search term to the beginning
+          await AsyncStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+      } catch (error) {
+        console.error('Error updating search history:', error);
+      }
+    }
+  };
+
+  const storingBookMark = async (searchTerm: any) => {
+    if (searchTerm.trim() !== '') {
+      try {
+        const bookMarkData = await AsyncStorage.getItem('bookMark');
+        const bookMarkString = bookMarkData ? JSON.parse(bookMarkData) : [];
+
+        // Check if the word already exists in history
+        if (!bookMarkString.includes(searchTerm)) {
+          bookMarkString.unshift(searchTerm); // Add the new search term to the beginning
+          await AsyncStorage.setItem(
+            'bookMark',
+            JSON.stringify(bookMarkString),
+          );
+        }
+        setBookmark(true);
+        Alert.alert('Info', 'Word Added In Bookmark', [
+          {
+            text: 'Ok',
+            onPress: () => console.log('Cancel Pressed'),
+          },
+        ]);
+      } catch (error) {
+        console.error('Error updating Bookmark:', error);
+      }
+    }
+  };
+
+  const bookmarkHandle = async (Item: any) => {
+    try {
+      await setBookmark(false);
+      const historyData = await AsyncStorage.getItem('bookMark');
+      const history = historyData ? JSON.parse(historyData) : [];
+
+      const lowercaseSearchTerm = Item.toLowerCase();
+
+      let bool = false;
+      history.some((item: any) => {
+        item.toLowerCase() === lowercaseSearchTerm;
+        if (item == lowercaseSearchTerm) {
+          setBookmark(true);
+          bool = true;
+          return;
+        }
+      });
+      if (bool == false) {
+        setBookmark(false);
+      }
+    } catch (error) {
+      console.error('Error loading search history:', error);
+    }
+  };
+
+  useEffect(() => {
+    //@ts-ignore
+    if (route.params && route.params.selectedWord) {
+      //@ts-ignore
+      setNewWord(route.params.selectedWord);
+      setBookmark(false); //@ts-ignore
+      LoadWordFromDiffScreem(route.params.selectedWord);
+    }
+  }, [route.params]);
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={['white', '#773fe8']}
+        colors={['white', '#b6a1d4']}
         style={styles.container}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}>
@@ -152,7 +283,7 @@ const Home = () => {
             <View style={{marginVertical: 20}}>
               <Image
                 style={{height: 100, width: 200}}
-                source={require('../../assests/Images/Group_Purple.png')}
+                source={require('../../assests/Images/Group_Gray.png')}
               />
             </View>
             <View style={styles.parent}>
@@ -162,13 +293,32 @@ const Home = () => {
                 onChangeText={searchWord}
                 ref={textInputRef}
                 mode="outlined"
-                onEndEditing={() => getInfo()}
-                style={styles.textInput}
+                onEndEditing={() => {
+                  getInfo();
+                }}
+                style={[styles.textInput, {}]}
+                textColor="#000"
+                theme={{colors: {primary: '#1e0342'}}}
+                outlineStyle={{
+                  borderWidth: 2,
+                  borderColor:
+                    inputValidation == 'true' || inputValidation == undefined
+                      ? 'red'
+                      : '#000',
+                  borderRadius: 10,
+                }}
                 // caretHidden={true}
               />
             </View>
+            {inputValidation == 'true' || inputValidation == undefined ? (
+              <View style={{marginTop: 10}}>
+                <Text style={{color: 'red', fontWeight: 'bold', fontSize: 16}}>
+                  "Search Input is Empty"
+                </Text>
+              </View>
+            ) : null}
           </View>
-          <View style={{marginLeft: 10, marginRight: 10, height: 60}}>
+          <View style={{marginRight: 10, height: 60}}>
             <View
               style={{
                 // flex:1,
@@ -219,12 +369,12 @@ const Home = () => {
                 borderRadius: 5,
                 shadowColor: 'rgba(0,0,0, .9)', // IOS
                 backgroundColor: '#fff',
-                elevation: 10,
+                elevation: 20,
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'row',
               }}>
-              <ActivityIndicator size="large" color="#00ff00" />
+              <ActivityIndicator size="large" color="#000" />
             </View>
           ) : (
             <>
@@ -232,37 +382,40 @@ const Home = () => {
                 <View
                   style={{
                     height: '50%',
-                    borderWidth: 2,
+                    borderWidth: 3,
                     marginHorizontal: 15,
                     marginVertical: 22,
-                    borderRadius: 5,
+                    borderRadius: 23,
                     shadowColor: 'rgba(0,0,0, .9)', // IOS
                     backgroundColor: '#fff',
                     elevation: 10,
                     justifyContent: 'center',
                     alignItems: 'center',
+                    borderColor: '#000',
                   }}>
-                  <View style={{alignItems: 'center'}}>
-                    <Text
-                      style={{
-                        color: 'black',
-                        fontSize: 19,
-                        fontStyle: 'italic',
-                        fontWeight: 'bold',
-                      }}>
-                      Defination(s) will appear here!
-                    </Text>
-                    <TouchableOpacity onPress={focusTextInput}>
+                  <View style={{}}>
+                    <View style={{alignItems: 'center'}}>
                       <Text
                         style={{
-                          color: '#0ca8eb',
-                          margin: 10,
-                          fontSize: 17,
+                          color: 'black',
+                          fontSize: 19,
                           fontStyle: 'italic',
+                          fontWeight: 'bold',
                         }}>
-                        Tap Here Start Exploration
+                        Defination(s) will appear here!
                       </Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity onPress={focusTextInput}>
+                        <Text
+                          style={{
+                            color: '#0ca8eb',
+                            margin: 10,
+                            fontSize: 17,
+                            fontStyle: 'italic',
+                          }}>
+                          Tap Here Start Exploration
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               ) : (
@@ -274,7 +427,7 @@ const Home = () => {
                         borderWidth: 2,
                         marginHorizontal: 15,
                         marginVertical: 22,
-                        borderRadius: 5,
+                        borderRadius: 20,
                         shadowColor: 'rgba(0,0,0, .9)', // IOS
                         backgroundColor: '#fff',
                         elevation: 10,
@@ -327,7 +480,7 @@ const Home = () => {
                       }}>
                       <View
                         style={{
-                          backgroundColor: '#90F5E4',
+                          backgroundColor: '#ad95cf',
                           height: 45,
                           width: '100%',
                           borderTopRightRadius: 8,
@@ -336,26 +489,59 @@ const Home = () => {
                         <View
                           style={{
                             flexDirection: 'row',
-                            padding: 10,
+                            padding: 8,
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}>
-                          <Text
+                          <View
                             style={{
-                              color: 'black',
-                              fontSize: 20,
-                              fontWeight: 'bold',
+                              width: '80%',
+                              flexDirection: 'row',
+                              // backgroundColor: 'red',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                             }}>
-                            Word -
-                          </Text>
-                          <Text
-                            style={{
-                              color: 'black',
-                              fontSize: 20,
-                              fontStyle: 'italic',
-                            }}>
-                            {'  '}"{checkedWord}"
-                          </Text>
+                            <Text
+                              style={{
+                                color: 'black',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                              }}>
+                              Word -
+                            </Text>
+                            <Text
+                              style={{
+                                color: 'black',
+                                fontSize: 24,
+                                fontStyle: 'italic',
+                                fontWeight: 'bold',
+                                marginTop: -3,
+                              }}>
+                              {' '}
+                              "{checkedWord}"
+                            </Text>
+                          </View>
+                          {bookmark ? (
+                            <TouchableOpacity
+                              style={{}}
+                              onPress={() => storingBookMark(checkedWord)}>
+                              <MaterialIcons
+                                name="favorite"
+                                color={'black'}
+                                size={20}
+                              />
+                            </TouchableOpacity>
+                          ) : (
+                            <TouchableOpacity
+                              style={{}}
+                              onPress={() => storingBookMark(checkedWord)}>
+                              <MaterialIcons
+                                name="favorite-border"
+                                color={'#000'}
+                                size={20}
+                              />
+                            </TouchableOpacity>
+                          )}
                         </View>
                       </View>
                       <ScrollView
@@ -421,7 +607,6 @@ const Home = () => {
                               </View>
                             ) : null}
                           </View>
-
                           {example == '' || example == undefined ? null : (
                             <View style={{marginRight: 30, marginVertical: 10}}>
                               <Text
@@ -485,19 +670,19 @@ const Home = () => {
               )}
             </>
           )}
+          {wordExist ? (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop:-10
+              }}>
+              <Text style={{color: 'black'}}>
+                (Tip : Scroll down to see all Definations and Examples)
+              </Text>
+            </View>
+          ) : null}
         </View>
-        {wordExist ? (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 20,
-            }}>
-            <Text style={{color: 'black'}}>
-              (Tip : Scroll down to see all Definations and Examples)
-            </Text>
-          </View>
-        ) : null}
       </LinearGradient>
     </SafeAreaView>
   );

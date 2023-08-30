@@ -20,12 +20,15 @@ const styles = StyleSheet.create({
     buttonDesign: {
       shadowColor: 'rgba(0,0,0, .9)', // IOS
       backgroundColor: '#fff',
-      elevation: 10,
+      elevation: 15,
       height: 50,
-      width: 106,
+      width: 100,
       justifyContent: 'center',
       alignItems: 'center',
       flexDirection: 'row',
+      borderWidth:2,
+      marginLeft:10,
+      borderRadius:10
     },
     // buttonText: {
     //   // fontSize: 1,
@@ -72,6 +75,8 @@ const styles = StyleSheet.create({
       // paddingLeft: 0,
       // backgroundColor: '#fff',
       // color: '#424242',
+      fontWeight:'bold',
+      fontSize:20
     },
   });
 
