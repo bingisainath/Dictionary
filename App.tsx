@@ -4,9 +4,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import 'react-native-gesture-handler';
 
+
+import { DrawerContent } from './src/components/drawerContent/drawerContent';
 import Home from './src/Screens/Home/Home';
 import History from './src/Screens/History/History';
-import { DrawerContent } from './src/components/drawerContent/drawerContent';
+import Favorites from './src/Screens/Favorites/Favorites';
+import SpeechToText from './src/Screens/SpeechToText/SpeechToText';
+import Support from './src/Screens/Support/Support';
 
 const Drawer = createDrawerNavigator();
 
@@ -28,6 +32,9 @@ const App = () => {
             >
             <Drawer.Screen name="Home" component={Home} />
             <Drawer.Screen name="History" component={History} />
+            <Drawer.Screen name="Favorites" component={Favorites} />
+            <Drawer.Screen name="SpeechToText" component={SpeechToText} />
+            <Drawer.Screen name="Support" component={Support} />
           </Drawer.Navigator>
         </NavigationContainer>
       ) : (

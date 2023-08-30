@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, BackHandler} from 'react-native';
 import {
   useTheme,
   Avatar,
@@ -11,11 +11,11 @@ import {
   TouchableRipple,
   Switch,
 } from 'react-native-paper';
-import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';//@ts-ignore
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';//@ts-ignore
+import Entypo from 'react-native-vector-icons/Entypo';//@ts-ignore
+import Ionicons from 'react-native-vector-icons/Ionicons';//@ts-ignore
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';//@ts-ignore
 
 
 export function DrawerContent(props:any) {
@@ -39,18 +39,8 @@ export function DrawerContent(props:any) {
               />
               <View style={{marginLeft: 15, flexDirection: 'column'}}>
                 <Title style={styles.title}>Guest</Title>
-                {/* <Caption style={styles.caption}>email</Caption> */}
               </View>
             </View>
-
-            {/* <View style={styles.row}>
-              <View style={styles.section}>
-                <Paragraph style={[styles.paragraph, styles.caption]}>
-                  Address:
-                </Paragraph>
-                <Caption style={styles.caption}>address</Caption>
-              </View>
-            </View> */}
           </View>
 
           <Drawer.Section style={styles.drawerSection}>
@@ -74,11 +64,11 @@ export function DrawerContent(props:any) {
             />
             <DrawerItem
               icon={({focused}) => (
-                <Ionicons name="today-outline" color={'#009387'} size={20} />
+                <Ionicons name="bookmarks-outline" color={'#009387'} size={20} />
               )}
-              label="Word Of the Day"
+              label="Favorites"
               onPress={() => {
-                props.navigation.navigate('WOD');
+                props.navigation.navigate('Favorites');
               }}
             />
             <DrawerItem
@@ -87,7 +77,7 @@ export function DrawerContent(props:any) {
               )}
               label="Speech To Text"
               onPress={() => {
-                props.navigation.navigate('STT');
+                props.navigation.navigate('SpeechToText');
               }}
             />
             <DrawerItem
@@ -96,7 +86,7 @@ export function DrawerContent(props:any) {
               )}
               label="Support"
               onPress={() => {
-                props.navigation.navigate('SupportScreen');
+                props.navigation.navigate('Support');
               }}
             />
           </Drawer.Section>
@@ -124,7 +114,7 @@ export function DrawerContent(props:any) {
             <FontAwesome5 name="user-lock" color={'#009387'} size={20} />
           )}
           label="Quit App"
-          onPress={() => console.log("Logout")}
+          onPress={() => {BackHandler.exitApp()}}
         />
       </Drawer.Section>
     </View>
