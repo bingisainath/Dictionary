@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setState(true);
-    }, 1500);
+    }, 1000);
   }, []);
 
   return (
@@ -43,7 +43,6 @@ const App = () => {
             <Drawer.Screen name="Home" component={Home} />
             <Drawer.Screen name="History" component={History} />
             <Drawer.Screen name="Bookmark" component={BookMark} />
-            {/* <Drawer.Screen name="SpeechToText" component={SpeechToText} /> */}
             <Drawer.Screen name="Support" component={Support} />
           </Drawer.Navigator>
         </NavigationContainer>
