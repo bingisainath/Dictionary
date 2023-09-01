@@ -1,9 +1,10 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, Button} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation, useIsFocused} from '@react-navigation/native'; //@ts-ignore
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import NetInfo from '@react-native-community/netinfo';
 
 import styles from './style';
 
@@ -64,7 +65,7 @@ const BookMark = () => {
               marginVertical: 30,
             }}>
             <Text style={{color: 'black', fontWeight: 'bold', fontSize: 25}}>
-              Words that you marked
+              Words that you Marked
             </Text>
           </View>
           <View style={{}}>
@@ -76,7 +77,7 @@ const BookMark = () => {
                   style={{
                     flexDirection: 'row',
                     borderBottomWidth: 1,
-                    marginHorizontal:30
+                    marginHorizontal: 30,
                   }}>
                   <TouchableOpacity
                     onPress={() => handleNavigateToHome(item)}

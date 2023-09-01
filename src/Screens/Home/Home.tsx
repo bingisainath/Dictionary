@@ -18,12 +18,15 @@ import Icon from 'react-native-vector-icons/Octicons'; //@ts-ignore
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Tts from 'react-native-tts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useRoute} from '@react-navigation/native';
+import {useRoute, useIsFocused} from '@react-navigation/native';
+import Voice from '@react-native-community/voice';
+import NetInfo from '@react-native-community/netinfo';
 
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 
 const Home = () => {
+  const isFocused = useIsFocused();
   const textInputRef = useRef(null);
   const route = useRoute();
 
@@ -37,11 +40,30 @@ const Home = () => {
   const [state, setState] = useState(false);
   const [bookmark, setBookmark] = useState(false);
   const [inputValidation, setInputValidation] = useState('');
+  const [internet, setInternet] = useState(false);
 
   useEffect(() => {
     Tts.setDefaultRate(0.5);
     Tts.setDefaultPitch(1);
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      checkInternet();
+      Voice.destroy().then(Voice.removeAllListeners);
+    }
+  }, [isFocused]);
+
+  const checkInternet = () => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed', state);
+      setInternet(state?.isConnected);
+    });
+    // Unsubscribe
+    return () => {
+      unsubscribe();
+    };
+  };
 
   const focusTextInput = () => {
     if (textInputRef.current) {
@@ -56,60 +78,12 @@ const Home = () => {
   };
 
   const LoadWordFromDiffScreem = async (item: any) => {
-    setBookmark(false);
-    setRes('loading');
-    setInputValidation('false');
-
-    var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + item;
-
-    return fetch(url)
-      .then(data => {
-        return data.json();
-      })
-      .then(response => {
-        setRes('');
-        setState(true);
-        storingWords(newWord);
-        bookmarkHandle(newWord);
-        if (
-          response.message ==
-          "Sorry pal, we couldn't find definitions for the word you were looking for."
-        ) {
-          console.log('Not found');
-          setWordExist(false);
-        } else {
-          setWordExist(true);
-
-          var word = response[0].word;
-          setCheckedWord(word);
-
-          var defs = response[0].meanings[0].definitions;
-          setDefinitionArr(defs);
-
-          defs.forEach((element: any) => {
-            console.log(element);
-          });
-
-          var pos = response[0].meanings[0].partOfSpeech;
-          setPartsOfSpeech(pos);
-
-          var eg = response[0].meanings[0].definitions[0].example;
-          setExample(eg);
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  };
-
-  const getInfo = () => {
-    if (newWord == '') {
-      setInputValidation('true');
-    } else {
+    if (internet) {
+      setBookmark(false);
       setRes('loading');
       setInputValidation('false');
 
-      var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + newWord;
+      var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + item;
 
       return fetch(url)
         .then(data => {
@@ -147,8 +121,65 @@ const Home = () => {
           }
         })
         .catch(e => {
-          console.log(e);
+          console.log('Catch error == > ', e);
         });
+    } else {
+      Alert.alert('Connect to internet');
+    }
+  };
+
+  const getInfo = () => {
+    if (internet) {
+      setSpeaking(true);
+      if (newWord == '') {
+        setInputValidation('true');
+      } else {
+        setRes('loading');
+        setInputValidation('false');
+
+        var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + newWord;
+
+        return fetch(url)
+          .then(data => {
+            return data.json();
+          })
+          .then(response => {
+            setRes('');
+            setState(true);
+            storingWords(newWord);
+            bookmarkHandle(newWord);
+            if (
+              response.message ==
+              "Sorry pal, we couldn't find definitions for the word you were looking for."
+            ) {
+              console.log('Not found');
+              setWordExist(false);
+            } else {
+              setWordExist(true);
+
+              var word = response[0].word;
+              setCheckedWord(word);
+
+              var defs = response[0].meanings[0].definitions;
+              setDefinitionArr(defs);
+
+              defs.forEach((element: any) => {
+                console.log(element);
+              });
+
+              var pos = response[0].meanings[0].partOfSpeech;
+              setPartsOfSpeech(pos);
+
+              var eg = response[0].meanings[0].definitions[0].example;
+              setExample(eg);
+            }
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      }
+    } else {
+      Alert.alert('Connect to Internet');
     }
   };
 
@@ -179,6 +210,7 @@ const Home = () => {
     setBookmark(false);
     setDefinitionArr('');
     setPartsOfSpeech('');
+    Voice.destroy().then(Voice.removeAllListeners);
     if (textInputRef.current == null) {
     } else {
       //@ts-ignore
@@ -265,6 +297,54 @@ const Home = () => {
     }
   }, [route.params]);
 
+  // const [result, setResult] = useState('');
+  const [speaking, setSpeaking] = useState(true);
+
+  const speechStartHandler = (e: any) => {
+    console.log('speechStart successful', e);
+  };
+  const speechEndHandler = (e: any) => {
+    setSpeaking(false);
+    console.log('stop handler', e);
+  };
+  const speechResultsHandler = (e: any) => {
+    const text = e.value[0];
+    setNewWord(text);
+    // setResult(text);
+  };
+  const startRecording = async () => {
+    setSpeaking(false);
+    try {
+      await Voice.start('en-Us');
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+  const stopRecording = async () => {
+    try {
+      await Voice.stop();
+      setSpeaking(true);
+    } catch (error) {
+      console.log('error', error);
+    }
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  };
+
+  useEffect(() => {
+    Voice.onSpeechStart = speechStartHandler;
+    Voice.onSpeechEnd = speechEndHandler;
+    Voice.onSpeechResults = speechResultsHandler;
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  // const clearVoice = () => {
+  //   setResult('');
+  // };
+
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
@@ -288,7 +368,7 @@ const Home = () => {
             </View>
             <View style={styles.parent}>
               <TextInput
-                label="Search a word..."
+                label="Search a word"
                 value={newWord}
                 onChangeText={searchWord}
                 ref={textInputRef}
@@ -309,6 +389,19 @@ const Home = () => {
                 }}
                 // caretHidden={true}
               />
+              {speaking ? (
+                <TouchableOpacity
+                  style={{marginTop: 10, marginLeft: 5}}
+                  onPress={startRecording}>
+                  <MaterialIcons name="mic" color="#000" size={40} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={{marginTop: 10, marginLeft: 5}}
+                  onPress={stopRecording}>
+                  <MaterialIcons name="pause" color="#000" size={40} />
+                </TouchableOpacity>
+              )}
             </View>
             {inputValidation == 'true' || inputValidation == undefined ? (
               <View style={{marginTop: 10}}>
@@ -670,18 +763,42 @@ const Home = () => {
               )}
             </>
           )}
-          {wordExist ? (
+          {internet ? (
+            <>
+              {speaking ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: -10,
+                  }}>
+                  <Text style={{color: 'black'}}>
+                    (Tip : Press the Mic to Speak the word you want to search)
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: -10,
+                  }}>
+                  <Text style={{color: 'red'}}>
+                    (Tip : press pause to stop speaking)
+                  </Text>
+                </View>
+              )}
+            </>
+          ) : (
             <View
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop:-10
+                marginTop: -10,
               }}>
-              <Text style={{color: 'black'}}>
-                (Tip : Scroll down to see all Definations and Examples)
-              </Text>
+              <Text style={{color: 'red',fontWeight:'bold'}}>Please check your Internet Connection</Text>
             </View>
-          ) : null}
+          )}
         </View>
       </LinearGradient>
     </SafeAreaView>

@@ -7,7 +7,7 @@ import 'react-native-gesture-handler';
 import {DrawerContent} from './src/components/drawerContent/drawerContent';
 import Home from './src/Screens/Home/Home';
 import History from './src/Screens/History/History';
-import BookMark from './src/Screens/Favorites/Favorites';
+import BookMark from './src/Screens/Bookmarks/Bookmark';
 import SpeechToText from './src/Screens/SpeechToText/SpeechToText';
 import Support from './src/Screens/Support/Support';
 
@@ -42,8 +42,8 @@ const App = () => {
             drawerContent={props => <DrawerContent {...props} />}>
             <Drawer.Screen name="Home" component={Home} />
             <Drawer.Screen name="History" component={History} />
-            <Drawer.Screen name="BookMark" component={BookMark} />
-            <Drawer.Screen name="SpeechToText" component={SpeechToText} />
+            <Drawer.Screen name="Bookmark" component={BookMark} />
+            {/* <Drawer.Screen name="SpeechToText" component={SpeechToText} /> */}
             <Drawer.Screen name="Support" component={Support} />
           </Drawer.Navigator>
         </NavigationContainer>

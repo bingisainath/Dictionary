@@ -1,16 +1,46 @@
-import {View, Text, Animated, Image} from 'react-native';
-import React, {useState} from 'react';
+import {View, Text, Animated, Image, Linking, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from './style';
-import {TouchableOpacity} from 'react-native-gesture-handler';//@ts-ignore
+import {TouchableOpacity} from 'react-native-gesture-handler'; //@ts-ignore
 import StarRating from 'react-native-star-rating';
+import Rate, {AndroidMarket} from 'react-native-rate';
+import NetInfo from '@react-native-community/netinfo';
+import {useRoute, useIsFocused} from '@react-navigation/native';
 
 const Support = () => {
+  const isFocused = useIsFocused();
   const [rating, setRating] = useState(0);
+  const [internet, setInternet] = useState(false);
+
+  useEffect(() => {
+    if (isFocused) {
+      checkInternet();
+    }
+  }, [isFocused]);
+
+  const checkInternet = () => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed', state);
+      setInternet(state?.isConnected);
+    });
+    // Unsubscribe
+    return () => {
+      unsubscribe();
+    };
+  };
 
   const onStarRatingPress = (rating: any) => {
     setRating(rating);
     // You can add code here to send the rating to your backend or perform other actions
+  };
+
+  const handleSubmit = () => {
+    const GOOGLE_PACKAGE_NAME = 'com.fugo.wow';
+
+    Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(err =>
+      Alert.alert('Please check for the Google Play Store'),
+    );
   };
 
   return (
@@ -27,47 +57,6 @@ const Support = () => {
             justifyContent: 'center',
             height: '100%',
           }}>
-          {/* <View
-            style={{
-              alignItems: 'center',
-              height: '40%',
-              // backgroundColor: 'red',
-              width: '100%',
-            }}>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                fontWeight: 'bold',
-                margin: 10,
-                marginTop: 140,
-              }}>
-              Contact Us:
-            </Text>
-            <TouchableOpacity style={{flexDirection: 'row'}}>
-              <View
-                style={{
-                  margin: 10,
-                  // backgroundColor: 'red',
-                }}>
-                <Image
-                  style={{height: 15, width: 20}}
-                  source={require('../../assests/Images/gmail.png')}
-                />
-              </View>
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: 19,
-                  fontWeight: '600',
-                  fontStyle: 'italic',
-                  margin: 8,
-                  // backgroundColor: 'red',
-                }}>
-                bingisainath@gmail.com
-              </Text>
-            </TouchableOpacity>
-          </View> */}
           <View
             style={{
               alignItems: 'center',
@@ -118,6 +107,7 @@ const Support = () => {
             style={{marginHorizontal: 8}}
           />
           <TouchableOpacity
+            onPress={handleSubmit}
             style={{
               borderWidth: 2,
               borderColor: '#000',
@@ -133,6 +123,18 @@ const Support = () => {
             <Text style={{color: 'white'}}>Submit</Text>
           </TouchableOpacity>
         </View>
+        {internet ? null : (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: 20,
+            }}>
+            <Text style={{color: 'red', fontWeight: 'bold'}}>
+              Please check your Internet Connection
+            </Text>
+          </View>
+        )}
       </LinearGradient>
     </View>
   );

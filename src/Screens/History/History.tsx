@@ -37,10 +37,10 @@ const History = () => {
     <View style={styles.container}>
       <LinearGradient
         colors={['#fff', '#e3d8f2']}
-        style={styles.container}
+        style={styles.innerContainer}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1,marginBottom:30}}>
           <View
             style={{
               alignItems: 'center',
@@ -48,10 +48,10 @@ const History = () => {
               marginVertical: 30,
             }}>
             <Text style={{color: 'black', fontWeight: 'bold', fontSize: 25}}>
-              Search History
+              Words that you Explored
             </Text>
           </View>
-          <View style={{}}>
+          <View style={{marginBottom:20}}>
             <FlatList
               data={history}
               keyExtractor={(item, index) => index.toString()}

@@ -66,12 +66,12 @@ export function DrawerContent(props:any) {
               icon={({focused}) => (
                 <Ionicons name="bookmarks-outline" color={'#8658c7'} size={20} />
               )}
-              label="BookMark"
+              label="Bookmarks"
               onPress={() => {
-                props.navigation.navigate('BookMark');
+                props.navigation.navigate('Bookmark');
               }}
             />
-            <DrawerItem
+            {/* <DrawerItem
               icon={({focused}) => (
                 <MaterialCommunityIcons name="text-to-speech" color={'#8658c7'} size={22} />
               )}
@@ -79,7 +79,7 @@ export function DrawerContent(props:any) {
               onPress={() => {
                 props.navigation.navigate('SpeechToText');
               }}
-            />
+            /> */}
             <DrawerItem
               icon={({focused}) => (
                 <FontAwesome5 name="headset" color={'#8658c7'} size={20} />
