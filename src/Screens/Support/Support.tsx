@@ -36,11 +36,12 @@ const Support = () => {
   };
 
   const handleSubmit = () => {
-    const GOOGLE_PACKAGE_NAME = 'com.fugo.wow';
-
-    Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(err =>
-      Alert.alert('Please check for the Google Play Store'),
-    );
+    console.log("Support");
+    
+    // const GOOGLE_PACKAGE_NAME = 'com.fugo.wow';
+    // Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(err =>
+    //   Alert.alert('Please check for the Google Play Store'),
+    // );
   };
 
   return (
