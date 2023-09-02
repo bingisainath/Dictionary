@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
   // TextInput
+  Dimensions,
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import {TextInput} from 'react-native-paper'; //@ts-ignore
@@ -21,14 +22,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRoute, useIsFocused} from '@react-navigation/native';
 import Voice from '@react-native-community/voice';
 import NetInfo from '@react-native-community/netinfo';
+import LinearGradient from 'react-native-linear-gradient';
 
 import styles from './style';
-import LinearGradient from 'react-native-linear-gradient';
+import LoadingView from '../../components/loadingView/loadingView';
 
 const Home = () => {
   const isFocused = useIsFocused();
   const textInputRef = useRef(null);
   const route = useRoute();
+
+  const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
 
   const [newWord, setNewWord] = useState('');
   const [checkedWord, setCheckedWord] = useState('');
@@ -83,7 +88,7 @@ const Home = () => {
       setRes('loading');
       setInputValidation('false');
 
-      var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + item;
+      var url = 'https://api.dictionaryapi.dev/api/v2/entries/en/'+item;
 
       return fetch(url)
         .then(data => {
@@ -399,7 +404,7 @@ const Home = () => {
                 <TouchableOpacity
                   style={{marginTop: 10, marginLeft: 5}}
                   onPress={stopRecording}>
-                  <MaterialIcons name="pause" color="#000" size={40} />
+                  <MaterialIcons name="pause" color="red" size={40} />
                 </TouchableOpacity>
               )}
             </View>
@@ -453,39 +458,11 @@ const Home = () => {
             </View>
           </View>
           {res == 'loading' ? (
-            <View
-              style={{
-                height: '50%',
-                borderWidth: 2,
-                marginHorizontal: 15,
-                marginVertical: 22,
-                borderRadius: 5,
-                shadowColor: 'rgba(0,0,0, .9)', // IOS
-                backgroundColor: '#fff',
-                elevation: 20,
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <ActivityIndicator size="large" color="#000" />
-            </View>
+            <LoadingView />
           ) : (
             <>
               {state == false ? (
-                <View
-                  style={{
-                    height: '50%',
-                    borderWidth: 3,
-                    marginHorizontal: 15,
-                    marginVertical: 22,
-                    borderRadius: 23,
-                    shadowColor: 'rgba(0,0,0, .9)', // IOS
-                    backgroundColor: '#fff',
-                    elevation: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderColor: '#000',
-                  }}>
+                <View style={styles.initialContainer}>
                   <View style={{}}>
                     <View style={{alignItems: 'center'}}>
                       <Text
@@ -514,20 +491,7 @@ const Home = () => {
               ) : (
                 <>
                   {wordExist == false ? (
-                    <View
-                      style={{
-                        height: '50%',
-                        borderWidth: 2,
-                        marginHorizontal: 15,
-                        marginVertical: 22,
-                        borderRadius: 20,
-                        shadowColor: 'rgba(0,0,0, .9)', // IOS
-                        backgroundColor: '#fff',
-                        elevation: 10,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                      }}>
+                    <View style={styles.initialContainer}>
                       <ScrollView style={{}}>
                         <View
                           style={{
@@ -560,7 +524,7 @@ const Home = () => {
                   ) : (
                     <View
                       style={{
-                        height: '50%',
+                        height: '45%',
                         borderWidth: 2,
                         marginHorizontal: 15,
                         marginVertical: 22,
@@ -590,7 +554,6 @@ const Home = () => {
                             style={{
                               width: '80%',
                               flexDirection: 'row',
-                              // backgroundColor: 'red',
                               alignItems: 'center',
                               justifyContent: 'center',
                             }}>
@@ -770,9 +733,9 @@ const Home = () => {
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginTop: -10,
+                    // marginTop: -10,
                   }}>
-                  <Text style={{color: 'black'}}>
+                  <Text style={{color: 'black', fontSize: 14}}>
                     (Tip : Press the Mic to Speak the word you want to search)
                   </Text>
                 </View>
@@ -781,9 +744,8 @@ const Home = () => {
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginTop: -10,
                   }}>
-                  <Text style={{color: 'red'}}>
+                  <Text style={{color: 'red', fontSize: 14}}>
                     (Tip : press pause to stop speaking)
                   </Text>
                 </View>
@@ -796,7 +758,9 @@ const Home = () => {
                 justifyContent: 'center',
                 marginTop: -10,
               }}>
-              <Text style={{color: 'red',fontWeight:'bold'}}>Please check your Internet Connection</Text>
+              <Text style={{color: 'red', fontWeight: 'bold'}}>
+                Please check your Internet Connection
+              </Text>
             </View>
           )}
         </View>

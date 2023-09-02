@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {Dimensions} from 'react-native';
+import { Dimensions } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
   },
-  initialContainer: {
+  loadingContainer: {
     height: screenHeight / 2.5,
     borderWidth: 3,
     marginHorizontal: 15,
@@ -75,22 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 23,
     shadowColor: 'rgba(0,0,0, .9)', // IOS
     backgroundColor: '#fff',
-    elevation: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#000',
-    flexDirection: 'row',
-
-    // height: '45%',
-    // borderWidth: 2,
-    // marginHorizontal: 15,
-    // marginVertical: 22,
-    // borderRadius: 10,
-    // shadowColor: 'rgba(0,0,0, .9)', // IOS
-    // backgroundColor: '#fff',
-    // elevation: 10,
-    // justifyContent: 'center',
-    // alignItems: 'center',
+    elevation: 20,
   },
 });
 
