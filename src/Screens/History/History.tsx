@@ -64,6 +64,7 @@ const History = () => {
   const handleDeleteAll = async () => {
     try {
       await AsyncStorage.removeItem('searchHistory');
+      setHistory([]);
     } catch (error) {
       console.error('Error deleting item:', error);
     }
@@ -96,7 +97,7 @@ const History = () => {
               <View style={{alignItems: 'center', justifyContent: 'center'}}>
                 <Text
                   style={{color: 'black', fontSize: 20, marginVertical: 20}}>
-                  Start Exporing the world of words
+                  Start Exploring the world of words
                 </Text>
                 <TouchableOpacity onPress={handleExplore}>
                   <Text style={{color: '#0ca8eb', fontSize: 18}}>

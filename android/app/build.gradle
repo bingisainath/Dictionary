@@ -76,9 +76,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.dictionary"
+    namespace "com.sainathOfficial.Dictionary"
     defaultConfig {
-        applicationId "com.dictionary"
+        applicationId "com.sainathOfficial.Dictionary"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -756,7 +756,7 @@ const Home = () => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: -10,
+                marginTop: 10,
               }}>
               <Text style={{color: 'red', fontWeight: 'bold'}}>
                 Please check your Internet Connection

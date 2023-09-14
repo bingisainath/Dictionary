@@ -36,12 +36,13 @@ const Support = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Support");
+    // console.log("Support");
+    //https://play.google.com/store/apps/details?id=com.sainathOfficial.Dictionary
     
-    // const GOOGLE_PACKAGE_NAME = 'com.fugo.wow';
-    // Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(err =>
-    //   Alert.alert('Please check for the Google Play Store'),
-    // );
+    const GOOGLE_PACKAGE_NAME = 'com.fugo.wow';
+    Linking.openURL(`market://details?id=com.sainathOfficial.Dictionary`).catch(err =>
+      Alert.alert('Please check for the Google Play Store'),
+    );
   };
 
   return (
